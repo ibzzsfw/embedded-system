@@ -6,6 +6,9 @@
 #define DATA_PORT PORTB
 #define DATA_DDR DDRB
 
+#define CLEAR_DISPLAY 0x01
+#define RETURN_HOME 0x02
+
 void pulse_E() {
   COMMAND_PORT |= E;
   _delay_us(10);
@@ -68,8 +71,8 @@ void setup() {
 char buffer[16];
 
 void loop() {
-  send_command(0x01);
-  send_command(0x80);
+  send_command(CLEAR_DISPLAY);
+  send_command(RETURN_HOME);
 
   ADCSRA |= (1 << ADSC);
 

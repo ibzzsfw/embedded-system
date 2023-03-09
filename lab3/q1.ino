@@ -6,6 +6,9 @@
 #define DATA_PORT PORTB
 #define DATA_DDR DDRB
 
+#define CLEAR_DISPLAY 0x01
+#define RETURN_HOME 0x02
+
 void pulse_E() {
   COMMAND_PORT |= E;
   _delay_us(10);
@@ -53,8 +56,9 @@ void init_LCD() {
 }
 
 void init_ADC() {
-  ADMUX |= (1 << REFS0);
-  ADCSRA |= (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+  ADMUX |= (1 << REFS0); // set reference voltage to Vcc
+  ADCSRA |= (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) |
+            (1 << ADPS0); // enable ADC, set prescaler to 128
 }
 
 void setup() {
@@ -66,14 +70,17 @@ void setup() {
 char buffer[16];
 
 void loop() {
-  send_command(0x01);
-  send_command(0x80);
+  send_command(CLEAR_DISPLAY);
+  send_command(RETURN_HOME);
 
-  ADCSRA |= (1 << ADSC);
-  while (ADCSRA & (1 << ADSC)) {
-  }
+  ADCSRA |= (1 << ADSC); // start conversion
+  while (ADCSRA & (1 << ADSC))
+    ; // wait for conversion to finish
 
   uint16_t adcValue = ADC;
+  /*
+   *  From datasheet: V = mT + c ----> T = (V - c)/m
+   */
   uint16_t temp = ((adcValue / 1024.0 * 5000.0) - 500.0) / 10.0;
 
   itoa(temp, buffer, 10);
