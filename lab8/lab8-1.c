@@ -30,8 +30,7 @@ void initADC() {
 }
 
 void initPWM() {
-  TCCR0A = _BV(WGM01)     // Fast PWM mode
-           | _BV(WGM00)   // Fast PWM mode
+  TCCR0A = _BV(WGM01) | _BV(WGM00) // Fast PWM mode
            | _BV(COM0A1); // Clear OC0A on compare match, set OC0A at BOTTOM
 
   TCCR0B = _BV(CS02); // Prescaler = 256, F_PWM = F_CPU/(256*256)
